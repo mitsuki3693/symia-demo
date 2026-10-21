@@ -1210,8 +1210,12 @@ body:has(.expedition-hero) .world-mode{font-size:11px;background:#fffef9b8}
 .journey-life .journey-quiet-links button{color:#71806b;font-size:10px!important}
 
 /* The return card only projects actual loot and committed travel records. */
-.journey-life .travel-settlement.travel-return-card{margin:16px auto 0;padding:24px;max-width:620px;border:1px solid #d6dfca;background:#f1f5e9b8;border-radius:22px}
-.journey-life:has(.travel-return-card) .travel-stage{height:min(40dvh,400px);min-height:0}
+.journey-life .travel-return-overlay{position:absolute;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;background:#24372d38;border-radius:24px}
+.journey-life .travel-return-overlay[hidden]{display:none}
+.journey-life .travel-return-overlay .travel-return-card{box-sizing:border-box;width:min(620px,100%);max-height:100%;overflow-y:auto;overscroll-behavior:contain;margin:0;padding:24px;border:1px solid #d6dfca;background:#f4f7ed;border-radius:22px;box-shadow:0 12px 36px #24372d30;scrollbar-color:#9aa98a #edf2e5}
+.journey-life .forge-stage-area:has(.travel-return-overlay) .journey-fragment-trigger{display:none}
+.journey-life .journey-canvas:has(.travel-return-overlay) .journey-fragments{display:none}
+.journey-life:has(.travel-return-overlay) .travel-stage{height:clamp(360px,70dvh,660px);min-height:0}
 .travel-return-card>header{display:flex;gap:14px;align-items:center}
 .travel-return-card .avatar{width:50px;height:50px}
 .travel-return-card h2{margin:0;font-size:22px}
@@ -1267,7 +1271,11 @@ body:has(.expedition-hero) .world-mode{font-size:11px;background:#fffef9b8}
  .journey-timetable-note br{display:none}.journey-timetable-note{font-size:10px;margin-bottom:14px}
  .journey-life .placeholder-label{top:54px;font-size:8px;max-width:70%;padding:5px 8px}
  .journey-life .travel-settlement.travel-return-card{padding:18px}.travel-return-card h2{font-size:20px}.travel-return-actions{gap:8px;justify-content:center}
- .journey-life:has(.travel-return-card) .travel-stage{height:260px}
+ .journey-life .travel-return-overlay{padding:12px;border-radius:18px}
+ .journey-life:has(.travel-return-overlay) .travel-stage{height:clamp(360px,76dvh,580px)}
+ .travel-return-overlay .travel-return-actions{align-items:stretch;flex-direction:column}
+ .travel-return-overlay .travel-return-actions button{min-height:44px}
+ .travel-return-overlay .return-keepsake{min-width:0;flex:1 1 160px}
  .journey-life .journey-quiet-links{gap:12px;margin-top:12px}.journey-life .journey-quiet-links button{font-size:9px!important}
 }
 @media(prefers-reduced-transparency:reduce){
@@ -3528,6 +3536,7 @@ function view(s,now,h,prefs){
      <div class="journey-time-labels"><span>出发</span><span>归来</span></div>
     </div><div class="journey-arrival"><strong data-journey-eta>${esc(meta.label)}</strong><small data-journey-remaining>${esc(meta.detail)}</small></div></div>
    </section>
+   ${!h.readOnly&&t.phase==='returned'&&t.forge?`<div class="travel-return-overlay" role="dialog" aria-label="旅行归来与收获">${FV.settlement(t,h)}</div>`:''}
   </div>
   <div class="journey-understage">
    <div class="journey-status-heading"><h2 data-journey-title>${esc(p.title)}</h2><span data-journey-label>${status}</span></div>
@@ -3538,7 +3547,7 @@ function view(s,now,h,prefs){
    ${storyPanel?'':'<p class="journey-timetable-note">沿途的小事，一点点记下来。<br>归来后，翻开完整日记。</p>'}
    <div class="journey-fragment-scroll" tabindex="0" aria-label="${panelLabel}，可滚动">${storyPanel?root.SymiaTogether.panel(s,h):timeline(s)}</div>
   </aside></div>
-  ${!h.readOnly&&t.phase==='returned'?(t.forge?FV.settlement(t,h):`<div class="travel-settlement">${h.button('查看旅行收获','travel-settlement','','primary')}</div>`):''}
+  ${!h.readOnly&&t.phase==='returned'&&!t.forge?`<div class="travel-settlement">${h.button('查看旅行收获','travel-settlement','','primary')}</div>`:''}
   <footer class="journey-quiet-links">${h.button('旅行日记','travel-diaries','','text-button')}${h.button('旅行足迹','travel-footprints','','text-button')}${h.button(prefs.static?'开启动效':'减少动态效果','travel-motion',`aria-pressed="${prefs.static}"`,'text-button')}${t.forge?'':h.button('原探索页面','travel-legacy','','text-button')}</footer>
  </section>`;
 }
@@ -3719,6 +3728,7 @@ let page=new URLSearchParams(location.search).get('view')==='home'?'home':'world
 let detailIndex=null,departureView=null,pendingArrival=null,compactMap=false;
 let taskTab='active',journalFocus=null,returnOpen=false;
 const dismissedReturns=new Set();
+let presentedReturn=null;
 const TP=SymiaTravelPresentation;
 let travelEnabled=new URLSearchParams(location.search).get('travel')!=='legacy',travelFootprints=false,travelPreparing=false,travelCharactersOpen=false;
 let travelLastPhase=null,travelArrivalUntil=0,travelLastTrip=null,travelShownEvent=null;
@@ -3772,8 +3782,13 @@ function updateJourney(){
  if(trigger)trigger.setAttribute('aria-expanded',String(journeyUi.open));
  if(panel){const wasHidden=panel.hidden;panel.hidden=!journeyUi.open;const scroll=panel.querySelector('.journey-fragment-scroll');if(journeyUi.open){if(wasHidden)scroll.scrollTop=journeyUi.scroll;journeyUi.read=m.entries.length;}}
  const nextButton=$('[data-action=travel-continue]');if(nextButton){nextButton.disabled=!E.continuePlan(state,now()).allowed||continueBusy||stateWrites>0||busy||sliceBusy||!!storage.error;nextButton.setAttribute('aria-busy',String(continueBusy));}
- const settlement=$('.travel-settlement');if(settlement)settlement.hidden=arriving;
+ const settlement=$('.travel-return-overlay, .travel-settlement');if(settlement)settlement.hidden=arriving;
  if(travelArrivalUntil&&!arriving)travelArrivalUntil=0;
+ if(!arriving&&settlement?.classList.contains('travel-return-overlay')&&presentedReturn!==state.trip?.id){
+  presentedReturn=state.trip.id;
+  settlement.querySelector('.travel-return-card')?.scrollIntoView({block:'center',behavior:'instant'});
+  settlement.querySelector('button')?.focus({preventScroll:true});
+ }
  maybeTravelReturn();
 }
 
@@ -3818,12 +3833,12 @@ function updateTravel(){
  const description=$('[data-travel-description]');if(description)description.textContent=arriving?'到了，慢慢走进归途。':p.description;
  const progress=$('.travel-status progress');if(progress)progress.value=p.progress;
  const pct=$('[data-travel-percent]');if(pct)pct.textContent=Math.floor(p.progress*100)+'%';
- const settlement=$('.travel-settlement');if(settlement)settlement.hidden=arriving;
+ const settlement=$('.travel-return-overlay, .travel-settlement');if(settlement)settlement.hidden=arriving;
  if(travelArrivalUntil&&!arriving)travelArrivalUntil=0;
  maybeTravelReturn();
 }
 
-function presentation(){if(embedded)parent.postMessage({channel:'symia-expedition-ui',kind:'presentation',overlayOpen:travelActive()&&(travelPreparing||travelCharactersOpen||travelFootprints),landing:travelActive()&&!SymiaTogether.replaying()&&(!state.trip||state.trip.phase==='complete'),immersive:page==='tasks'||$('#node-detail').open,modalOpen:$('#modal').open||!!globalThis.SymiaProductionUI?.isOpen()},location.origin);}
+function presentation(){if(embedded)parent.postMessage({channel:'symia-expedition-ui',kind:'presentation',overlayOpen:travelActive()&&(travelPreparing||travelCharactersOpen||travelFootprints||!!$('.travel-return-overlay')),landing:travelActive()&&!SymiaTogether.replaying()&&(!state.trip||state.trip.phase==='complete'),immersive:page==='tasks'||$('#node-detail').open,modalOpen:$('#modal').open||!!globalThis.SymiaProductionUI?.isOpen()},location.origin);}
 function openTravelDiaries(){
  modal('旅行日记',SymiaForgeView.diaries(state,{button}));
 }
