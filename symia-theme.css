@@ -1,0 +1,54 @@
+/* Shared by the React app and the embedded expedition. */
+:root {
+  --symia-paper:#faf8f3;
+  --symia-surface:#fffdf9;
+  --symia-ink:#3e433b;
+  --symia-muted:#656a60;
+  --symia-line:#e3e4da;
+  --symia-sage:#e3e9dc;
+  --symia-green:#4c624d;
+  --symia-apricot:#edcba8;
+  --symia-glass:#fffdf8;
+  --symia-glass-shadow:inset 0 1px 0 #ffffffed,0 8px 30px #38432d12;
+}
+@supports (backdrop-filter:blur(1px)) {
+  :root { --symia-glass:linear-gradient(145deg,#fffefaeb,#faf8f3c4); }
+}
+@media(prefers-reduced-transparency:reduce) { :root { --symia-glass:#fffdf9; } }
+
+/* Only embedded exploration adopts the app system; standalone keeps its layout. */
+body.embedded-expedition {
+  --paper:var(--symia-paper);--white:var(--symia-surface);--ink:var(--symia-ink);
+  --muted:var(--symia-muted);--line:var(--symia-line);--sage:var(--symia-sage);
+  --green:var(--symia-green);--terra:#8b583e;background:var(--symia-paper);color:var(--symia-ink);
+}
+.embedded-expedition #main-content { max-width:1280px;padding:24px 32px 40px; }
+.embedded-expedition h1,.embedded-expedition h2 { font-family:'Noto Serif SC','Songti SC',SimSun,serif;font-weight:500; }
+.embedded-expedition .page-heading { margin-bottom:20px; }
+.embedded-expedition .page-heading h1 { font-size:28px; }
+.embedded-expedition .page-heading p { font-size:13px;color:var(--symia-muted); }
+.embedded-expedition .primary { background:var(--symia-apricot);color:#493b2c;border-radius:14px; }
+.embedded-expedition .primary:hover { background:#e6bf97; }
+.embedded-expedition :is(.story-panel,.slice-party-panel,.slice-event-panel,.slice-detail,.modal) {
+  background:var(--symia-glass);box-shadow:var(--symia-glass-shadow);border-color:transparent;
+  backdrop-filter:blur(18px) saturate(1.05);-webkit-backdrop-filter:blur(18px) saturate(1.05);border-radius:18px;
+}
+.embedded-expedition :is(button,input,select,summary) { min-height:44px; }
+.embedded-expedition button:focus-visible { outline:2px solid var(--symia-green);outline-offset:3px; }
+.embedded-expedition ::selection { background:#dce6d2;color:#344132; }
+.embedded-expedition [data-action="compact-map"] { display:none; }
+@media(max-width:680px) {
+  .embedded-expedition #main-content { padding:18px 16px 28px; }
+  .embedded-expedition .page-heading h1 { font-size:24px; }
+  .embedded-expedition .page-heading p { font-size:12px; }
+}
+@media(prefers-reduced-transparency:reduce) {
+  .embedded-expedition :is(.story-panel,.slice-party-panel,.slice-event-panel,.slice-detail,.modal) { backdrop-filter:none;-webkit-backdrop-filter:none; }
+}
+.embedded-expedition .node-detail { inset:0;width:100vw;height:100dvh;max-width:none;max-height:none;margin:0;border:0;border-radius:0;padding:clamp(16px,3vw,40px);box-sizing:border-box;overflow:auto; }
+.embedded-expedition .node-dialog-header { position:sticky;top:-1px;z-index:5;background:#faf8f3ed;backdrop-filter:blur(16px);padding:10px 0 18px; }
+.embedded-expedition .node-dialog-grid { grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);align-items:start; }
+.embedded-expedition .node-detail .scene { max-height:calc(100dvh - 140px); }
+.embedded-expedition .return-party { display:flex;gap:12px;margin:18px 0; }
+.embedded-expedition .return-party .avatar { width:58px;height:58px; }
+@media(max-width:700px) { .embedded-expedition .node-dialog-grid { grid-template-columns:1fr; }.embedded-expedition .node-detail .scene { position:relative;top:auto;max-height:34dvh; }.embedded-expedition .node-dialog-header h2 { font-size:22px; }.embedded-expedition .node-dialog-header button { flex-shrink:0; }.embedded-expedition .node-detail .story-panel { padding:18px 0; } }

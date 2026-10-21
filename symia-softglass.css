@@ -1,0 +1,337 @@
+/* Symia soft mist glass. Shared verbatim by React and expedition builds.
+ * Shared material and font declarations intentionally beat the older scene CSS,
+ * including lazy-loaded styles. Layout and scene pixels are never filtered.
+ * Seamless milky transmission: quiet edges, no sculpted inset highlights.
+ */
+:root {
+  --symia-font-ui: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  --mist-paper: #f2f3ed;
+  --mist-solid: #f8f9f3;
+  --mist-ink: #344139;
+  --mist-muted: #5f6b61;
+  --mist-green: #405c47;
+  --mist-line: #6e806326;
+  --mist-radius: 24px;
+  --mist-filter: blur(24px) saturate(1.16);
+  --mist-thin: #f8f9f3;
+  --mist-pane: #f8f9f3;
+  --mist-modal: #f8f9f3;
+  --mist-inset: #ffffff66;
+  --mist-selected: #dce7d0;
+  --mist-rim: none;
+  --mist-shadow: 0 8px 28px -16px #44544214;
+  --mist-float-shadow: 0 14px 40px -20px #3f513c20;
+  --mist-wash: radial-gradient(ellipse at 17% 31%, #c9d5b98c, transparent 47%), radial-gradient(ellipse at 88% 28%, #e7ddce91, transparent 44%), radial-gradient(ellipse at 61% 92%, #d4d8e561, transparent 48%), #f2f3ed;
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root {
+    --mist-thin: linear-gradient(135deg, #ffffffe0, #fafcf55c 52%, #edf1e578);
+    --mist-pane: linear-gradient(135deg, #ffffffc9, #fafcf586 52%, #eff2eaa1);
+    --mist-modal: linear-gradient(135deg, #ffffffeb, #f8faf0c9 55%, #edf2e7db);
+    --mist-selected: linear-gradient(135deg, #ecf3e4dc, #cbdbb9b8);
+  }
+}
+:is(.symia-app, body.embedded-expedition) {
+  --symia-paper: var(--mist-paper);
+  --symia-surface: var(--mist-solid);
+  --symia-ink: var(--mist-ink);
+  --symia-muted: var(--mist-muted);
+  --symia-green: var(--mist-green);
+  --symia-line: var(--mist-line);
+  --symia-sage: #e0e9d8;
+  --symia-glass: var(--mist-pane);
+  --symia-glass-shadow: var(--mist-shadow);
+  --home-ink: var(--mist-ink);
+  --home-muted: var(--mist-muted);
+  --paper: var(--mist-paper);
+  --ink: var(--mist-ink);
+  --muted: var(--mist-muted);
+  background: var(--mist-wash);
+  background-attachment: fixed;
+  color: var(--mist-ink);
+  scrollbar-color: #a8b39d var(--mist-paper);
+}
+.symia-app .app-header {
+  background: #fbfcf54a;
+  box-shadow: none;
+}
+.symia-app .app-header::after { opacity: .35; }
+.symia-app .app-header-note { color: var(--mist-muted); }
+.symia-app :is(.home-study, .expedition-shell, .expedition-frame) { background: transparent; }
+.embedded-expedition #main-content { background: transparent; }
+.symia-app .app-page { padding-top: 30px; }
+.symia-app .page-title h1 { color: var(--mist-ink); }
+
+.symia-app .phone-idle,
+.symia-app .phone-contacts,
+.symia-app .home-chat,
+.symia-app .life-composer,
+.symia-app .life-calendar,
+.symia-app .memory-sheet,
+.symia-app .memory-page .empty,
+.symia-app .setting-row,
+.symia-app .home-kitchen,
+.symia-app .home-editor,
+.symia-app .home-interactions,
+.symia-app .home-garden,
+.symia-app .home-activity,
+.symia-app .shared-kitchen-chat,
+.symia-app .garden-care-panel,
+.symia-app .garden-plot-popover,
+.symia-app .home-error,
+.symia-app .home-speech-bubble {
+  background: var(--mist-pane) !important;
+  border: 1px solid #ffffff33 !important;
+  box-shadow: var(--mist-shadow) !important;
+  -webkit-backdrop-filter: var(--mist-filter) !important;
+  backdrop-filter: var(--mist-filter) !important;
+  border-radius: var(--mist-radius) !important;
+}
+
+.symia-app .app-dock,
+.symia-app .app-utilities,
+.symia-app .home-rooms,
+.symia-app .role-tabs,
+.symia-app .home-presence-people,
+.symia-app .home-presence-actions,
+.symia-app .home-fridge-entry,
+.symia-app .home-garden-entry,
+.symia-app .home-overview,
+.symia-app .home-frame-reset,
+.symia-app .home-tool-buttons > button,
+.symia-app .home-tool-handle,
+.symia-app .garden-scene-tools,
+.symia-app .garden-seed-mode,
+.symia-app .expedition-floating-tools > button,
+.symia-app .expedition-toolbar nav,
+.symia-app .landscape-hint,
+.symia-app .toast {
+  background: var(--mist-thin) !important;
+  border: 1px solid #ffffff33 !important;
+  box-shadow: var(--mist-float-shadow) !important;
+  -webkit-backdrop-filter: var(--mist-filter) !important;
+  backdrop-filter: var(--mist-filter) !important;
+}
+
+.symia-app .backpack-dialog,
+.symia-app .expedition-tools {
+  background: var(--mist-modal) !important;
+  border: 1px solid #ffffff33 !important;
+  box-shadow: var(--mist-float-shadow) !important;
+  -webkit-backdrop-filter: var(--mist-filter) !important;
+  backdrop-filter: var(--mist-filter) !important;
+  border-radius: var(--mist-radius) !important;
+}
+
+body .story-panel,
+body .slice-party-panel,
+body .slice-event-panel,
+body .slice-detail,
+body .travel-notes,
+body .task-tracking,
+body .task-entry,
+body .task-empty,
+body .slice-journal,
+body .recap-paper,
+body .journal-card,
+body .inventory-panel,
+body .garden-panel {
+  background: var(--mist-pane) !important;
+  border: 1px solid #ffffff33 !important;
+  box-shadow: var(--mist-shadow) !important;
+  -webkit-backdrop-filter: var(--mist-filter) !important;
+  backdrop-filter: var(--mist-filter) !important;
+  border-radius: var(--mist-radius) !important;
+}
+
+body .overview-weather,
+body .expedition-hero .expedition-hero-button,
+body .overview-status,
+body .map-return-hint,
+body .task-tabs,
+body .route {
+  background: var(--mist-thin) !important;
+  border: 1px solid #ffffff33 !important;
+  box-shadow: var(--mist-float-shadow) !important;
+  -webkit-backdrop-filter: var(--mist-filter) !important;
+  backdrop-filter: var(--mist-filter) !important;
+}
+
+body #modal,
+body #modal:has(.expedition-plan),
+body .node-detail {
+  background: var(--mist-modal) !important;
+  border: 1px solid #ffffff33 !important;
+  box-shadow: var(--mist-float-shadow) !important;
+  -webkit-backdrop-filter: var(--mist-filter) !important;
+  backdrop-filter: var(--mist-filter) !important;
+  border-radius: var(--mist-radius) !important;
+}
+
+.concept-page .concept-menu-panel,
+.entry-page .entry-menu-panel,
+.entry-page .entry-hello {
+  background: var(--mist-thin) !important;
+  border: 1px solid #ffffff33 !important;
+  box-shadow: var(--mist-float-shadow) !important;
+  -webkit-backdrop-filter: var(--mist-filter) !important;
+  backdrop-filter: var(--mist-filter) !important;
+  border-radius: var(--mist-radius) !important;
+}
+
+/* Child controls catch the light without another compositing/blur layer. */
+.symia-app :is(.bag-item, .kitchen-recipe, .fridge-inventory li, .editor-view button, .editor-tool button, .editor-orbit button, .editor-history button, .editor-door button, .editor-storage, .editor-rotate),
+body :is(.choice, .expedition-plan .party-select > label) {
+  background: var(--mist-inset);
+  border-color: var(--mist-line);
+  box-shadow: none;
+}
+.symia-app :is(textarea, input:not([type=checkbox]):not([type=radio]), select),
+body.embedded-expedition :is(textarea, input:not([type=checkbox]):not([type=radio]), select) {
+  background: #ffffff78;
+  color: var(--mist-ink);
+  border-color: #879b765c;
+  caret-color: var(--mist-green);
+}
+.symia-app :is(textarea, input)::placeholder { color: var(--mist-muted); }
+.symia-app .phone-contacts { align-self: start; padding: 20px 14px 12px; }
+.symia-app .phone-contacts h2 { padding-inline: 10px; margin-bottom: 12px; }
+.symia-app .phone-contact + .phone-contact { margin-top: 6px; }
+.symia-app .phone-contact-note { margin-bottom: 0; }
+.symia-app .setting-row { padding: 24px; margin-bottom: 18px; }
+.symia-app .memory-page .empty { padding: 40px 24px; margin-top: 24px; }
+.symia-app .life-composer textarea { border-radius: 12px; padding: 12px; margin: 8px 0; background: #ffffff4d; }
+.symia-app .life-composer select { border-radius: 10px; }
+.symia-app .life-post { padding: 28px 8px; }
+.symia-app .life-empty { border-radius: var(--mist-radius); background: #ffffff2e; }
+.symia-app .home-chat-message.from-user { background: #dfe8d3b8; }
+.symia-app .home-chat-log { scrollbar-color: #a8b39d transparent; }
+.symia-app .app-utilities { padding: 3px; border-radius: 999px; }
+.symia-app .app-dock { --mist-filter: blur(28px) saturate(1.2); }
+.symia-app .app-dock button { border-color: transparent; color: var(--mist-muted); }
+.symia-app .app-dock button.is-active,
+.symia-app :is(.phone-contact, .home-rooms button, .phone-switcher button, .bag-categories button, .editor-view button, .editor-tool button, .home-tool-buttons button)[aria-pressed=true],
+.symia-app .app-utilities button[aria-current=page],
+.symia-app .life-date-grid button[aria-pressed=true],
+.symia-app .home-presence-person[aria-pressed=true] {
+  background: var(--mist-selected) !important;
+  color: #334f35;
+  box-shadow: none !important;
+}
+.symia-app .app-dock button:not(.is-active):hover,
+.symia-app :is(.phone-contact, .app-utilities button):hover { background: #ffffff8c; }
+.symia-app :is(.primary, .home-chat-composer button[type=submit], .kitchen-next) {
+  background: linear-gradient(140deg, #f3e1cce8, #e8c6a5e0);
+  box-shadow: none !important;
+  color: #493b2c;
+}
+.symia-app .home-speech-bubble::after { border-top-color: #f4f7edf0; }
+.symia-app .home-tool-buttons > button { --mist-radius: 50%; }
+.symia-app .expedition-tools { --mist-filter: blur(28px) saturate(1.12); }
+.symia-app .backpack-dialog { --mist-filter: blur(28px) saturate(1.12); }
+.symia-app .bag-item { border-radius: 18px; }
+.symia-app .backpack-dialog::backdrop,
+body #modal::backdrop, body .node-detail::backdrop {
+  background: #3f4b3833;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+/* The clear map remains an illustration, with glass only on its floating UI. */
+body .expedition-hero {
+  border: 1px solid #ffffff33 !important;
+  border-radius: 28px !important;
+  background: #ffffff38 !important;
+  box-shadow: var(--mist-shadow) !important;
+}
+body .expedition-hero .overview-art::after { content: none !important; }
+body .expedition-hero .overview-art::before { opacity: .1 !important; }
+body .expedition-hero .overview-weather { border-radius: 999px !important; color: var(--mist-green); }
+body .expedition-hero .expedition-hero-button {
+  border-radius: 22px !important;
+  color: var(--mist-green) !important;
+  min-height: 60px;
+}
+body .expedition-hero .expedition-hero-button:hover:not(:disabled) { background: var(--mist-selected) !important; }
+body .node-detail { --mist-radius: 0px; }
+body .node-dialog-header { background: #f8faf0db; }
+body .node-detail .story-panel,
+body .node-dialog-grid .story-panel {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+body .expedition-plan { background: transparent; }
+/* Task entries were flat rows; glass edges need an inset and clear separation. */
+body :is(.task-tracking, .task-entry, .task-empty) { padding: 20px; }
+body .task-entry { margin-bottom: 14px; }
+body .task-tabs { width: fit-content; padding: 4px 12px; border-radius: 16px; margin-block: 20px; }
+@media (max-width: 700px) {
+  body :is(.task-tracking, .task-entry, .task-empty) { padding: 16px; }
+}
+
+body .expedition-plan .primary.wide,
+body .node-detail .primary.wide { background: var(--mist-selected) !important; color: var(--mist-green) !important; }
+.symia-app :is(button, a, input, textarea, select, summary):focus-visible,
+body.embedded-expedition :is(button, a, input, textarea, select, summary):focus-visible {
+  outline: 2px solid #496746;
+  outline-offset: 3px;
+}
+.symia-app :is(.phone-contact, .app-dock button, .bag-item),
+body .expedition-hero-button {
+  transition: background-color 160ms ease-out, color 160ms ease-out, box-shadow 160ms ease-out;
+}
+@media (max-width: 700px) {
+  :root { --mist-radius: 20px; --mist-filter: blur(16px) saturate(1.1); }
+  .symia-app .app-page { padding-top: 18px; }
+  .symia-app .phone-contacts { padding: 16px 10px; }
+  .symia-app .setting-row { padding: 20px; }
+  .symia-app .app-dock { --mist-filter: blur(20px) saturate(1.12); }
+  .symia-app .app-utilities button { min-width: 44px; min-height: 44px; }
+  .symia-app .expedition-floating-tools > button { min-width: 44px; min-height: 44px; }
+  body .expedition-hero { border-radius: 22px !important; }
+  body .expedition-hero .expedition-hero-button { border-radius: 18px !important; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --mist-thin: var(--mist-solid);
+    --mist-pane: var(--mist-solid);
+    --mist-modal: var(--mist-solid);
+    --mist-selected: #dce7d0;
+    --mist-inset: #f3f5ed;
+    --mist-filter: none;
+  }
+  .symia-app *, body.embedded-expedition *, .concept-page *, .entry-page * {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  .symia-app .backpack-dialog::backdrop, body #modal::backdrop, body .node-detail::backdrop {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .symia-app *, body.embedded-expedition * { transition: none !important; }
+}
+
+/* A single native sans face includes labels inside controls and lazy scene UI.
+ * Root IDs cover the React app and the standalone/embedded expedition dialogs;
+ * specificity also retires historical editorial !important font declarations. */
+:root body,
+:root body :is(#root, #app, #modal, #node-detail, #toast),
+:root body :is(#root, #app, #modal, #node-detail, #toast) * {
+  font-family: var(--symia-font-ui) !important;
+}
+.symia-app :is(.avatar, .app-dock button, .home-rooms button) {
+  box-shadow: none !important;
+}
+
+/* Button states use fill, not a perimeter stroke. Keep native keyboard focus. */
+:root body :is(#root, #app, #modal, #node-detail) :is(button, [role="button"], input[type="button"], input[type="submit"]) {
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+:root body :is(#root, #app, #modal, #node-detail) :is(button, [role="button"], input[type="button"], input[type="submit"]):not(:focus-visible) {
+  outline: none !important;
+}

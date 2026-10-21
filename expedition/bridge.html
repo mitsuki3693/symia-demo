@@ -1,0 +1,40 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>Symia garden state</title>
+<script src="/symia-demo/pages-demo.js"></script><script src="src/content.js"></script><script src="src/expedition-text.js"></script><script src="src/lantern-story.js"></script><script src="src/slice.js"></script><script src="src/autonomy.js"></script><script src="src/stories.js"></script><script src="src/garden.js"></script><script src="src/worlds.js"></script><script src="src/forge-episode.js"></script><script src="src/static-world.js"></script><script src="src/travel-packages.js"></script><script src="src/forge-runtime.js"></script><script src="src/engine.js"></script><script src="src/adapters.js"></script>
+<script src="src/exploration-transfer.js"></script><script>
+(async () => {
+  await SymiaTravelPackages.ready;
+  const E=SymiaEngine,A=SymiaAdapters,G=SymiaGarden,storage=new A.LocalStorageAdapter();
+  const types=new Set(['GARDEN_KITCHEN_PREPARE','GARDEN_KITCHEN_ACK','GARDEN_SOW','GARDEN_HARVEST','GARDEN_HARVEST_ALL','GARDEN_PROTECT','GARDEN_PULL','GARDEN_WATER','GARDEN_SETTINGS','GARDEN_ASSIST','GARDEN_ADD_BOX','GARDEN_SET_BOX_POSITIONS','GARDEN_DEMO_MATURE','GARDEN_DEMO_SEEDS','GARDEN_DEMO_AGENT','ADVANCE_DEMO','GREET_PET']);
+  const result=state=>({garden:state.garden,inventory:state.inventory,souvenirs:{map:state.home.map,salt:state.inventory.silver_salt||0,pet:state.home.pet},clockOffsetMs:state.clockOffsetMs,now:Date.now()+state.clockOffsetMs,crops:G.CROPS,open:G.open(state.garden),maxBoxes:G.MAX_BOXES,actors:G.ACTORS,available:G.available(state),homeImpact:SymiaSlice.homeImpact(state,Date.now()+state.clockOffsetMs)});
+  function run(request){
+    if(storage.error)throw Error(storage.error);
+    let state=storage.load()||E.createState(crypto.randomUUID?.()||`home-${Date.now()}`);
+    if(storage.error)throw Error(storage.error);
+    if(request.kind==='import-exploration'){
+      if(typeof request.raw!=='string'||request.raw.length>4000000)throw Error('旧存档大小不正确。');
+      const source=JSON.parse(request.raw),merged=SymiaExplorationTransfer.merge(state,source);
+      // Backups must succeed before the single atomic state write.
+      if(JSON.stringify(merged)!==JSON.stringify(state)){
+        localStorage.setItem('symia.exploration.before-merge',JSON.stringify(state));
+        localStorage.setItem('symia.exploration.source-backup',request.raw);
+        if(!storage.save(merged))throw Error(storage.error);
+      }
+      return result(merged);
+    }
+    const action=request.kind==='action'&&types.has(request.action?.type)?request.action:{type:'TICK'};
+    const next=E.transition(state,action,Date.now()+state.clockOffsetMs);
+    if(JSON.stringify(next)!==JSON.stringify(state)&&!storage.save(next))throw Error(storage.error||'花园保存失败');
+    return result(next);
+  }
+  window.addEventListener('message',async event=>{
+    if(event.origin!==location.origin||event.source!==parent||event.data?.channel!=='symia-garden-v1')return;
+    const reply={channel:'symia-garden-v1',id:event.data.id};
+    try{
+      const task=()=>run(event.data);
+      reply.data=navigator.locks?await navigator.locks.request('symia-garden-state',task):task();
+    }catch(error){reply.error=error.message||'花园暂时无法使用';}
+    parent.postMessage(reply,location.origin);
+  });
+  parent.postMessage({channel:'symia-garden-v1',ready:true},location.origin);
+})();
+</script></html>
